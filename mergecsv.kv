@@ -1,3 +1,5 @@
+#:import hex_to_color kivy.utils.get_color_from_hex
+
 
 <FocusTextInput@TextInput+FocusBehavior>:
 
@@ -21,7 +23,7 @@
 
     markup: True
     line_height: 1.2
-    text: '[color=#808080]{}.{}[/color] ->\n    {}'.format(self.src.in_idx, self.src_name, self.name)
+    text: '[i][color=#808080]{}.{}[/color] ->[/i]\n    {}'.format(self.src.in_idx, self.src_name, self.name)
 
 
 <AppRoot>:
@@ -29,7 +31,7 @@
 
     canvas.before:
         Color:
-            rgb: .17, .17, .17
+            rgb: .96, .96, .96
         Rectangle:
             pos: self.pos
             size: self.size
@@ -43,12 +45,12 @@
         ColoredLabel:
             id: in_label
             text: 'input' if len(app.in_files) == 1 else 'inputs'
-            background_color: (1, .2, .2, 1)
+            background_color: hex_to_color('#c8282d')
 
         ColoredLabel:
             id: out_label
             text: 'output'
-            background_color: (.2, .2, 1, 1)
+            background_color: hex_to_color('#21a6a5')
 
     BoxLayout:
         id: header
@@ -93,6 +95,13 @@
         height: '35dp'
         orientation: 'horizontal'
         spacing: '10dp'
+
+        canvas.before:
+            Color:
+                rgb: .2, .2, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
         FocusTextInput:
             id: cmd_box

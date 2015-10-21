@@ -10,6 +10,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.properties import ListProperty, StringProperty, ObjectProperty, NumericProperty
 from kivy.clock import Clock
 from kivy.lang import Builder
+from kivy.utils import get_color_from_hex
 
 
 from work import load_csv_as_dict, save_dict_as_csv
@@ -30,7 +31,7 @@ Builder.load_string("""
     text: self.name
 
     size_hint_y: None
-    height: '52sp'
+    height: '45sp'
     font_size: '14sp'
 
     text_size: self.size
@@ -42,10 +43,14 @@ Builder.load_string("""
 
     canvas.before:
         Color:
-            rgba: 1, 1, 1, .86
+            rgba: 1, 1, 1, .2
         Rectangle:
-            pos: self.x, self.y + 1
-            size: self.width, self.height - 1
+            pos: self.x, self.y
+            size: self.width, self.height
+        Color:
+            rgba: .2, .2, .2, .6
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
 """)
 
 
@@ -60,7 +65,11 @@ class InField(FieldWidget):
         super(InField, self).__init__(**kw)
 
         self.dest_manager = dest_manager
-        self.arrow = Arrow(start=self)
+        self.arrow = Arrow(
+            start=self,
+            color=[.2, .2, .2, .6],
+            start_color=get_color_from_hex('#c8282d'),
+            end_color=get_color_from_hex('#21a6a5'))
         self.add_widget(self.arrow)
 
     def on_dest(self, *ar):
@@ -242,6 +251,7 @@ class MergeCSVApp(App):
                     height='20dp',
                     bold=True,
                     shorten=True,
+                    color=[.1, .1, .1, 1],
                 )
             )
 

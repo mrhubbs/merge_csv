@@ -15,7 +15,9 @@ class Arrow(Widget):
     start_pos = ListProperty([0, 0])
     end_pos = ListProperty([0, 0])
 
-    color = ListProperty([0, 0, 0, 0])
+    color = ListProperty([1, 1, 1, 1])
+    end_color = ListProperty([1, 1, 1, 1])
+    start_color = ListProperty([1, 1, 1, 1])
 
     def __init__(self, **kw):
         super(Arrow, self).__init__(**kw)
@@ -100,18 +102,22 @@ class Arrow(Widget):
 
 Builder.load_string("""
 <Arrow>:
-    color: (1, 0, 0, 1) if self.end is not None else (1, 1, 1, 0)
-
     canvas:
         Color:
-            rgba: self.color
+            rgba: self.color if self.end is not None else (1, 1, 1, 0)
         Line:
             points: self.start_pos[0], self.start_pos[1], self.end_pos[0], self.end_pos[1]
             width: 2
+        Color:
+            rgba: self.start_color if self.end is not None else (1, 1, 1, 0)
         Line:
             circle: self.start_pos[0], self.start_pos[1], 4
+            width: 2
+        Color:
+            rgba: self.end_color if self.end is not None else (1, 1, 1, 0)
         Line:
             circle: self.end_pos[0], self.end_pos[1], 7
+            width: 2
 
 """)
 
