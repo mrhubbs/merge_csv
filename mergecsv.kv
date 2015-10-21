@@ -1,0 +1,90 @@
+
+<FocusTextInput@TextInput+FocusBehavior>:
+
+
+<ColoredLabel@Label>:
+    background_color: (0, 0, 0, 0)
+
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            pos: root.pos
+            size: root.size
+
+
+<OutField>:
+    src_name: self.src.name
+
+    height: '75dp'
+    markup: True
+    line_height: 1.5
+    text: '[color=#808080]{}[/color] ->\n    {}'.format(self.src_name, self.name)
+
+
+<AppRoot>:
+    orientation: 'vertical'
+
+    BoxLayout:
+        id: header
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '35dp'
+
+        ColoredLabel:
+            id: in_label
+            text: 'input' if len(app.in_files) == 1 else 'inputs'
+            background_color: (1, .2, .2, 1)
+
+        ColoredLabel:
+            id: out_label
+            text: 'output'
+            background_color: (.2, .2, 1, 1)
+
+    ScrollView:
+        do_scroll_x: False
+
+        BoxLayout:
+            id: files
+            orientation: 'horizontal'
+            size_hint_y: None
+
+            GridLayout:
+                id: in_files
+                cols: 1
+                height: self.minimum_height
+                on_height: files.height = max(self.height, dest_fields.height)
+
+            Widget:
+                size_hint_x: None
+                width: files.width * .25
+
+            DestManager:
+                id: dest_fields
+                height: self.minimum_height
+                on_height: files.height = max(self.height, in_files.height)
+
+    BoxLayout:
+        size_hint_y: None
+        height: '35dp'
+        orientation: 'horizontal'
+        spacing: '10dp'
+
+        FocusTextInput:
+            id: cmd_box
+            multiline: False
+
+            recorded: ''
+
+            on_text_validate:
+                app.do_command(self.text)
+
+        Label:
+            text: 'record:'
+            size_hint_x: None
+            width: '65dp'
+
+        CheckBox:
+            id: record_cmds
+            size_hint_x: None
+            width: '35dp'
