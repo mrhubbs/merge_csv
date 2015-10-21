@@ -61,11 +61,25 @@
 
         TextInput:
             id: save_path
+            multiline: False
+            on_text_validate:
+                app.save_output(self.text)
+
+        ColoredLabel:
+            size_hint_x: None
+            width: '200sp'
+            color: .2, .2, .2, 1
+            text: "output will be {:,} lines\n({:,} columns)".format(app.out_lines, app.out_cols)
+            font_size: '13sp'
+            background_color: [0, 0, 0, .09]
 
         Button:
             text: 'Save'
             size_hint_x: None
             width: '75dp'
+
+            on_release:
+                app.save_output(save_path.text)
 
     ScrollView:
         do_scroll_x: False

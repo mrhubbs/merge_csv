@@ -3,17 +3,23 @@
 """
 
 
+import os
+
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.properties import ListProperty, StringProperty, ObjectProperty, NumericProperty
+from kivy.properties import (ListProperty, StringProperty,
+                             ObjectProperty, NumericProperty,
+                             DictProperty)
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.utils import get_color_from_hex
 
 
-from work import load_csv_as_dict, save_dict_as_csv
+from work import (load_csv_as_dict, save_dict_as_csv,
+                  get_smallest_number_of_lines, merge_dicts_by_mappings,
+                  truncate_dict)
 from toaster import toast
 from arrow import Arrow
 
@@ -119,11 +125,11 @@ class OutField(FieldWidget):
 
 
 class DestManager(GridLayout):
+    dests = DictProperty({})
+
     def __init__(self, **kw):
         super(DestManager, self).__init__(**kw)
         self.cols = 1
-
-        self.dests = {}
 
     def _find_by_name(self, name):
         for key, value in self.dests.items():
@@ -168,6 +174,9 @@ class DestManager(GridLayout):
             src.dest = dest
 
         self._sort()
+        # force an event to make sure things are updated
+        self.dests[self] = None
+        del self.dests[self]
 
     def _sort(self):
         children = self.children[:]
@@ -176,6 +185,15 @@ class DestManager(GridLayout):
 
         for c in children:
             self.add_widget(c)
+
+    def on_dests(self, *ar):
+        app = App.get_running_app()
+        mappings = app.get_mappings()
+
+        output = merge_dicts_by_mappings(app.in_dicts, mappings)
+        app.out_cols = len(output.keys())
+        app.out_lines = get_smallest_number_of_lines(output)
+        app.out_dict = truncate_dict(output, app.out_lines)
 
 
 Builder.load_string("""
@@ -186,6 +204,8 @@ Builder.load_string("""
 
 
 class SrcManager(GridLayout):
+    fname = StringProperty()
+
     def __init__(self, **kw):
         super(SrcManager, self).__init__(**kw)
         self.cols = 1
@@ -213,7 +233,11 @@ class AppRoot(BoxLayout):
 
 class MergeCSVApp(App):
     in_files = ListProperty([])
-    in_dicts = ListProperty([])
+    in_dicts = DictProperty({})
+
+    out_lines = NumericProperty(0)
+    out_cols = NumericProperty(0)
+    out_dict = DictProperty({})
 
     def build(self):
         self.root = AppRoot()
@@ -226,13 +250,39 @@ class MergeCSVApp(App):
         """
         Rebuild the inputs and the output.
         """
-        self.in_dicts = [load_csv_as_dict(f) for f in self.in_files]
+        self.in_dicts = {f: load_csv_as_dict(f) for f in self.in_files}
 
-        self._build_inputs(self.in_dicts, self.in_files)
+        self._build_inputs(
+            self.in_dicts.values(),
+            self.in_dicts.keys())
         self._auto_build_dests()
 
-    def create_out_dict(self):
-        pass
+    def get_mappings(self):
+        all_mappings = {}
+
+        for src_list in self.root.ids['in_files'].children:
+            if isinstance(src_list, GridLayout):
+                mappings = []
+
+                for src in src_list.children:
+                    if src.dest is not None:
+                        mappings.append((src.name, src.dest.name))
+
+                all_mappings[src_list.fname] = mappings
+
+        return all_mappings
+
+    def save_output(self, path):
+        path = os.path.expanduser(path)
+
+        try:
+            # TODO: this is an error-prone step, are we catching all
+            # reasonable exceptions?
+            save_dict_as_csv(self.out_dict, path)
+        except (IOError, OSError, IndexError) as e:
+            toast(str(e), width='650dp')
+        else:
+            toast('merged output saved')
 
     def _build_inputs(self, in_dicts, fnames):
         self.root.ids['in_files'].clear_widgets()
@@ -241,9 +291,9 @@ class MergeCSVApp(App):
 
         n = 0
         for in_d, fname in zip(in_dicts, fnames):
-            l = SrcManager()
+            l = SrcManager(fname=fname)
 
-            text = '{} - {} ({} lines)'.format(n, fname, len(in_d.values()[0]))
+            text = '{} - {} ({:,} lines)'.format(n, fname, len(in_d.values()[0]))
             self.root.ids['in_files'].add_widget(
                 ColoredLabel(
                     text=text,

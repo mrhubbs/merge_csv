@@ -25,7 +25,12 @@ def load_csv_as_dict(csv_path):
                 continue
 
             while row_idx < row_len:
-                dat[row_idx].append(float(row[row_idx]))
+                try:
+                    val = float(row[row_idx])
+                except (ValueError, SyntaxError):
+                    val = str(row[row_idx])
+
+                dat[row_idx].append(val)
                 row_idx += 1
 
     return {h: d for h, d in zip(header_row, dat)}
@@ -61,6 +66,32 @@ def save_dict_as_csv(dat, csv_path):
     # it if something goes wrong.
     copy_temp_file(csv_temp, csv_path)
     csv_temp.close()
+
+
+def get_smallest_number_of_lines(d):
+    lengths = [len(i) for i in d.values()]
+
+    if len(lengths) < 1:
+        return 0
+    else:
+        return min(lengths)
+
+
+def truncate_dict(d, length):
+    for key, value in d.items():
+        d[key] = value[:length]
+
+    return d
+
+
+def merge_dicts_by_mappings(dicts, mappings):
+    out = {}
+
+    for dictkey, mappings in mappings.items():
+        for _from, _to in mappings:
+            out[_to] = dicts[dictkey][_from]
+
+    return out
 
 
 def copy_temp_file(temp_fd, fpath, bs=4096):

@@ -111,12 +111,12 @@ Builder.load_string("""
         Color:
             rgba: self.start_color if self.end is not None else (1, 1, 1, 0)
         Line:
-            circle: self.start_pos[0], self.start_pos[1], 4
+            circle: self.start_pos[0], self.start_pos[1], 3
             width: 2
         Color:
             rgba: self.end_color if self.end is not None else (1, 1, 1, 0)
         Line:
-            circle: self.end_pos[0], self.end_pos[1], 7
+            circle: self.end_pos[0], self.end_pos[1], 5
             width: 2
 
 """)
