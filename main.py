@@ -116,16 +116,27 @@ class DestManager(GridLayout):
 
         self.dests = {}
 
-    def create_dest(self, name, src):
-        # Delete dest if already have it.
-        if src.name in self.dests:
-            old_dest = self.dests[src.name]
+    def _find_by_name(self, name):
+        for key, value in self.dests.items():
+            if value.name == name:
+                return key
+
+    def _delete(self, name):
+        if name in self.dests:
+            old_dest = self.dests[name]
 
             if old_dest.src is not None:
                 old_dest.src.dest = None
 
             self.remove_widget(old_dest)
-            del self.dests[src.name]
+            del self.dests[name]
+
+    def create_dest(self, name, src):
+        # Delete dest if already have it.
+        self._delete(src.name)
+        check = self._find_by_name(name)
+        if check is not None:
+            self._delete(check)
 
         new_dest = OutField(self, name=name, src=src)
         self.add_widget(new_dest)
