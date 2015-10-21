@@ -209,7 +209,7 @@ class MergeCSVApp(App):
             l = SrcManager()
             self.root.ids['in_files'].add_widget(
                 Label(
-                    text=fname + '%d - ' % n,
+                    text=('%d - ' % n) + fname,
                     size_hint_y=None,
                     height='50dp',
                     bold=True,

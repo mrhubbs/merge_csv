@@ -41,6 +41,21 @@
             text: 'output'
             background_color: (.2, .2, 1, 1)
 
+    BoxLayout:
+        id: header
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '35dp'
+        spacing: '10dp'
+
+        TextInput:
+            id: save_path
+
+        Button:
+            text: 'Save'
+            size_hint_x: None
+            width: '75dp'
+
     ScrollView:
         do_scroll_x: False
 
