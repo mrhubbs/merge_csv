@@ -17,6 +17,10 @@ from toaster import toast
 from arrow import Arrow
 
 
+class ColoredLabel(Label):
+    pass
+
+
 class FieldWidget(Label):
     name = StringProperty()
 
@@ -26,7 +30,8 @@ Builder.load_string("""
     text: self.name
 
     size_hint_y: None
-    height: '35dp'
+    height: '45sp'
+    font_size: '13sp'
 
     text_size: self.size
     halign: 'left'
@@ -207,12 +212,15 @@ class MergeCSVApp(App):
         n = 0
         for in_d, fname in zip(in_dicts, fnames):
             l = SrcManager()
+
+            text = '{} - {} ({} lines)'.format(n, fname, len(in_d.values()[0]))
             self.root.ids['in_files'].add_widget(
-                Label(
-                    text=('%d - ' % n) + fname,
+                ColoredLabel(
+                    text=text,
                     size_hint_y=None,
-                    height='50dp',
+                    height='20dp',
                     bold=True,
+                    shorten=True,
                 )
             )
 

@@ -2,8 +2,11 @@
 <FocusTextInput@TextInput+FocusBehavior>:
 
 
-<ColoredLabel@Label>:
+<ColoredLabel>:
     background_color: (0, 0, 0, 0)
+    text_size: self.size
+    halign: 'center'
+    valign: 'middle'
 
     canvas.before:
         Color:
@@ -16,14 +19,20 @@
 <OutField>:
     src_name: self.src.name
 
-    height: '75dp'
     markup: True
-    line_height: 1.5
+    line_height: 1.2
     text: '[color=#808080]{}.{}[/color] ->\n    {}'.format(self.src.in_idx, self.src_name, self.name)
 
 
 <AppRoot>:
     orientation: 'vertical'
+
+    canvas.before:
+        Color:
+            rgb: .17, .17, .17
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
     BoxLayout:
         id: header
