@@ -10,4 +10,4 @@ python main.py CSV_INPUT_ONE CSV_INPUT_TWO . . . CSV_INPUT_N
 
 ## Screenshot
 
-[screenshot](docs/screenshot.png)
+![screenshot](docs/screenshot.png)
