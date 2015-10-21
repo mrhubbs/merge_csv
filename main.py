@@ -30,8 +30,8 @@ Builder.load_string("""
     text: self.name
 
     size_hint_y: None
-    height: '45sp'
-    font_size: '13sp'
+    height: '52sp'
+    font_size: '14sp'
 
     text_size: self.size
     halign: 'left'
@@ -147,6 +147,16 @@ class DestManager(GridLayout):
             dest = self.create_dest(dest_name, src)
             src.dest = dest
 
+        self._sort()
+
+    def _sort(self):
+        children = self.children[:]
+        children.sort(key=lambda a: (a.src.in_idx, a.src.name))
+        self.clear_widgets()
+
+        for c in children:
+            self.add_widget(c)
+
 
 Builder.load_string("""
 <DestManager>:
@@ -224,7 +234,9 @@ class MergeCSVApp(App):
                 )
             )
 
-            for name in in_d:
+            names = in_d.keys()
+            names.sort()
+            for name in names:
                 l.add_widget(InField(dm, name=name, in_idx=n))
 
             self.root.ids['in_files'].add_widget(l)
