@@ -135,3 +135,13 @@
             id: record_cmds
             size_hint_x: None
             width: '35dp'
+
+        Button:
+            size_hint_x: None
+            width: '50sp'
+            text: 'save'
+
+            on_release:
+                f = open('recorded mappings.txt', 'w')
+                f.write(cmd_box.recorded)
+                f.close()

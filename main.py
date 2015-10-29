@@ -273,7 +273,13 @@ class MergeCSVApp(App):
         return all_mappings
 
     def save_output(self, path):
-        path = os.path.expanduser(path)
+        path = os.path.expanduser(
+            os.path.normpath(
+                os.path.realpath(
+                    path
+                )
+            )
+        )
 
         try:
             # TODO: this is an error-prone step, are we catching all
@@ -293,7 +299,10 @@ class MergeCSVApp(App):
         for in_d, fname in zip(in_dicts, fnames):
             l = SrcManager(fname=fname)
 
-            text = '{} - {} ({:,} lines)'.format(n, fname, len(in_d.values()[0]))
+            text = '{} - {} ({:,} lines)'.format(
+                n,
+                os.path.basename(fname),
+                len(in_d.values()[0]))
             self.root.ids['in_files'].add_widget(
                 ColoredLabel(
                     text=text,
@@ -381,7 +390,7 @@ class MergeCSVApp(App):
             return
 
         if self.root.ids.record_cmds.active:
-            self.root.ids.cmd_box.recorded += self.root.ids.cmd_box.text
+            self.root.ids.cmd_box.recorded += self.root.ids.cmd_box.text + '\n'
 
         # Reset the text on a successful command.
         self.root.ids.cmd_box.text = ''
