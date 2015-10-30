@@ -275,8 +275,8 @@ class MergeCSVApp(App):
         self.in_dicts = {f: load_csv_as_dict(f) for f in self.in_files}
 
         self._build_inputs(
-            self.in_dicts.values(),
-            self.in_dicts.keys())
+            [self.in_dicts[f] for f in self.in_files],
+            self.in_files)
         self._auto_build_dests()
 
     def get_mappings(self):
