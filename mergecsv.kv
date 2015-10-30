@@ -1,9 +1,6 @@
 #:import hex_to_color kivy.utils.get_color_from_hex
 
 
-<FocusTextInput@TextInput+FocusBehavior>:
-
-
 <ColoredLabel>:
     background_color: (0, 0, 0, 0)
     text_size: self.size
@@ -117,7 +114,7 @@
                 pos: self.pos
                 size: self.size
 
-        FocusTextInput:
+        TextInput:
             id: cmd_box
             multiline: False
 
@@ -145,3 +142,30 @@
                 f = open('recorded mappings.txt', 'w')
                 f.write(cmd_box.recorded)
                 f.close()
+
+    BoxLayout:
+        size_hint_y: None
+        height: '35dp'
+        orientation: 'horizontal'
+        spacing: '10dp'
+
+        canvas.before:
+            Color:
+                rgb: .2, .2, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        TextInput:
+            id: mapping_path
+            multiline: False
+            on_text_validate:
+                root.apply_mapping_file(self.text)
+
+        Button:
+            size_hint_x: None
+            width: '50sp'
+            text: 'load'
+
+            on_release:
+                root.apply_mapping_file(mapping_path.text)
