@@ -24,6 +24,16 @@ from toaster import toast
 from arrow import Arrow
 
 
+def expand_path(path):
+    return os.path.realpath(
+        os.path.normpath(
+            os.path.expanduser(
+                path
+            )
+        )
+    )
+
+
 class ColoredLabel(Label):
     pass
 
@@ -228,7 +238,19 @@ Builder.load_string("""
 
 
 class AppRoot(BoxLayout):
-    pass
+    def apply_mapping_file(self, fpath):
+        fpath = expand_path(fpath)
+
+        try:
+            with open(fpath, 'r') as f:
+                for line in f.read().split('\n'):
+                    if not line:
+                        continue
+
+                    self.ids.cmd_box.text = line
+                    self.ids.cmd_box.dispatch('on_text_validate')
+        except IOError as err:
+            toast(str(err), width='700dp')
 
 
 class MergeCSVApp(App):
@@ -273,13 +295,7 @@ class MergeCSVApp(App):
         return all_mappings
 
     def save_output(self, path):
-        path = os.path.expanduser(
-            os.path.normpath(
-                os.path.realpath(
-                    path
-                )
-            )
-        )
+        path = expand_path(path)
 
         try:
             # TODO: this is an error-prone step, are we catching all
@@ -402,12 +418,31 @@ class MergeCSVApp(App):
 if __name__ == '__main__':
     import argparse
 
+
+    def set_map_file(app, fname):
+        app.root.apply_mapping_file(fname)
+
+
+    def set_out_file(app, fpath):
+        app.root.ids.save_path.text = fpath
+
+
     parser = argparse.ArgumentParser()
     parser.add_argument('f1')
     parser.add_argument('f2')
+    parser.add_argument('--map-file', type=str)
+    parser.add_argument('--out-file', type=str)
 
     args = parser.parse_args()
-
     app = MergeCSVApp()
-    Clock.schedule_once(lambda *ar: app.set_files(args.f1, args.f2), 1)
+
+    Clock.schedule_once(
+        lambda *ar: app.set_files(args.f1, args.f2), 1)
+    if args.map_file is not None:
+        Clock.schedule_once(
+            lambda dt: set_map_file(app, args.map_file), 2)
+    if args.out_file is not None:
+        Clock.schedule_once(
+            lambda dt: set_out_file(app, args.out_file), 1.1)
+
     app.run()
