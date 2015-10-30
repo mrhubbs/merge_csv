@@ -252,6 +252,16 @@ class AppRoot(BoxLayout):
         except IOError as err:
             toast(str(err), width='700dp')
 
+    def save_mapping_file(self, fpath):
+        fpath = expand_path(fpath)
+
+        try:
+            f = open(fpath, 'w')
+            f.write(self.ids.cmd_box.recorded)
+            f.close()
+        except IOError as err:
+            toast(str(err), width='700dp')
+
 
 class MergeCSVApp(App):
     in_files = ListProperty([])

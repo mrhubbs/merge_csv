@@ -38,23 +38,14 @@
         orientation: 'horizontal'
         size_hint_y: None
         height: '35dp'
-
-        ColoredLabel:
-            id: in_label
-            text: 'input' if len(app.in_files) == 1 else 'inputs'
-            background_color: hex_to_color('#c8282d')
-
-        ColoredLabel:
-            id: out_label
-            text: 'output'
-            background_color: hex_to_color('#21a6a5')
-
-    BoxLayout:
-        id: header
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: '35dp'
         spacing: '10dp'
+
+        ColoredLabel:
+            size_hint_x: None
+            width: '65sp'
+            text: 'output:'
+            color: .2, .2, .2, 1
+            background_color: [0, 0, 0, .09]
 
         TextInput:
             id: save_path
@@ -77,6 +68,22 @@
 
             on_release:
                 app.save_output(save_path.text)
+
+    BoxLayout:
+        id: header
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '35dp'
+
+        ColoredLabel:
+            id: in_label
+            text: 'input' if len(app.in_files) == 1 else 'inputs'
+            background_color: hex_to_color('#c8282d')
+
+        ColoredLabel:
+            id: out_label
+            text: 'output'
+            background_color: hex_to_color('#21a6a5')
 
     ScrollView:
         do_scroll_x: False
@@ -123,6 +130,26 @@
             on_text_validate:
                 app.do_command(self.text)
 
+    ColoredLabel:
+        size_hint_y: None
+        height: '30sp'
+        text: 'mappings'
+        color: .2, .2, .2, 1
+        background_color: [0, 0, 0, .09]
+
+    BoxLayout:
+        size_hint_y: None
+        height: '35dp'
+        orientation: 'horizontal'
+        spacing: '10dp'
+
+        canvas.before:
+            Color:
+                rgb: .2, .2, .2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
         Label:
             text: 'record:'
             size_hint_x: None
@@ -139,22 +166,7 @@
             text: 'save'
 
             on_release:
-                f = open('recorded mappings.txt', 'w')
-                f.write(cmd_box.recorded)
-                f.close()
-
-    BoxLayout:
-        size_hint_y: None
-        height: '35dp'
-        orientation: 'horizontal'
-        spacing: '10dp'
-
-        canvas.before:
-            Color:
-                rgb: .2, .2, .2
-            Rectangle:
-                pos: self.pos
-                size: self.size
+                root.save_mapping_file(mapping_path.text)
 
         TextInput:
             id: mapping_path
